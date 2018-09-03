@@ -31,7 +31,8 @@
   "autoload": {
     "psr-4": {
       "Contraption\\Core\\": "core/",
-      "Contraption\\App\\": "app/"
+      "Contraption\\App\\": "app/",
+      "Contraption\\Tests\\": "tests/"
     }
   }
 }
