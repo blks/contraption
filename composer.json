@@ -8,7 +8,9 @@
   "authors": [
     {
       "name": "Ollie Read",
-      "email": "me@ollieread.com"
+      "email": "me@ollieread.com",
+      "homepage": "https://ollieread.com",
+      "role": "developer"
     }
   ],
   "require": {
