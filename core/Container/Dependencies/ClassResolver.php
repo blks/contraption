@@ -46,7 +46,7 @@ class ClassResolver extends Resolver
 
             $constructorArguments = (new Vector($parameters))
                 ->map(function (\ReflectionParameter $parameter) use ($arguments) {
-                    return $this->resolveArgument($parameter, $arguments);
+                    return $this->resolveParameter($parameter, $arguments);
                 });
 
             return $reflection->newInstanceArgs($constructorArguments);
@@ -54,7 +54,7 @@ class ClassResolver extends Resolver
         }
     }
 
-    private function resolveArgument(ReflectionParameter $parameter, array $arguments)
+    private function resolveParameter(ReflectionParameter $parameter, array $arguments)
     {
         $container    = Container::instance();
         $type         = $parameter->getType();
