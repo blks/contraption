@@ -178,7 +178,7 @@ class Container implements ContainerInterface
      */
     public function getWith(string $id, array $arguments, bool $fresh = false)
     {
-        if (! $this->has($id)) {
+        if ($this->has($id)) {
             try {
                 $resolver = $this->getResolver($id);
 

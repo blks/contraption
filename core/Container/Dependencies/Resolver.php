@@ -7,7 +7,7 @@ abstract class Resolver
     /**
      * @var bool
      */
-    private $shared;
+    private $shared = false;
 
     /**
      * @var mixed
@@ -35,6 +35,7 @@ abstract class Resolver
 
     protected function isResolved(): bool
     {
+
         return $this->resolved !== null;
     }
 

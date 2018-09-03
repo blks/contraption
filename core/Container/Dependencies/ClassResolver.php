@@ -38,7 +38,7 @@ class ClassResolver extends Resolver
         try {
             $reflection  = new \ReflectionClass($this->class);
             $constructor = $reflection->getConstructor();
-            $parameters  = $constructor->getParameters() ?? [];
+            $parameters  = $constructor ? $constructor->getParameters() : [];
 
             if (! $constructor || ! $parameters) {
                 return $reflection->newInstance();
@@ -47,7 +47,8 @@ class ClassResolver extends Resolver
             $constructorArguments = (new Vector($parameters))
                 ->map(function (\ReflectionParameter $parameter) use ($arguments) {
                     return $this->resolveParameter($parameter, $arguments);
-                });
+                })
+                ->toArray();
 
             return $reflection->newInstanceArgs($constructorArguments);
         } catch (\ReflectionException $e) {
@@ -59,18 +60,22 @@ class ClassResolver extends Resolver
         $container    = Container::instance();
         $type         = $parameter->getType();
         $argumentName = $parameter->getName();
-        $argumentType = $type->getName() ?? null;
+        $argumentType = $type ? $type->getName() : null;
 
         if (isset($arguments[$argumentName])) {
             if ($argumentType && \gettype($arguments[$argumentName]) !== $argumentType) {
                 throw new \InvalidArgumentException(sprintf('Argument %s is incorrect type', $argumentName));
             }
 
-            return $argumentType[$argumentName];
+            return $arguments[$argumentName];
         }
 
         if ($argumentType) {
-            return $container->make($argumentType);
+            $argument = $container->make($argumentType);
+
+            if ($argument) {
+                return $argument;
+            }
         }
 
         if ($parameter->isOptional()) {
