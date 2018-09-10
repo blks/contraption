@@ -1,5 +1,5 @@
 {
-  "name": "ollieread/contraption",
+  "name": "contraption/contraption",
   "description": "An exercise in creating simple modern PHP frameworks",
   "keywords": ["php", "framework", "mvc", "nih", "why not"],
   "homepage": "https://github.com/ollieread/contraption",
@@ -21,16 +21,18 @@
     "psr/http-server-middleware": "^1.0",
     "psr/http-message": "^1.0",
     "php-ds/php-ds": "^1.2",
-    "nikic/fast-route": "^1.3"
+    "nikic/fast-route": "^1.3",
+    "psr/http-factory": "^1.0"
   },
   "require-dev": {
     "roave/security-advisories": "dev-master",
     "filp/whoops": "^2.0",
-    "phpunit/phpunit": "^7.0"
+    "phpunit/phpunit": "^7.0",
+    "symfony/var-dumper": "^4.1"
   },
   "autoload": {
     "psr-4": {
-      "Contraption\\Core\\": "core/",
+      "Contraption\\": "core/",
       "Contraption\\App\\": "app/",
       "Contraption\\Tests\\": "tests/"
     }
