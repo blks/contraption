@@ -2,14 +2,14 @@
 
 namespace Contraption\Tests;
 
-use Contraption\Core\Container\Container;
-use Contraption\Core\Container\Dependencies\ClassResolver;
+use Contraption\Core\Replicator\Container;
+use Contraption\Core\Replicator\Dependencies\ClassResolver;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-final class ContainerTest extends TestCase
+final class ReplicatorTest extends TestCase
 {
     public function testThrowsNotFoundException(): void
     {
