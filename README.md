@@ -10,7 +10,7 @@ The below are the requirements for Contraption.
 - PHP >= 7.2
 - Extensions
     - ext-json
-    - ext-ds
+    - [ext-ds](http://www.php.net/manual/en/book.ds.php)
 
 # Third Party
 While I'm trying to avoid other packages when working on this project, it's not always possible. Below are a list of all third party packages.
@@ -45,7 +45,56 @@ Each component of Contraption is designed to be a standalone package that functi
 Replicating things since forever.
 
 ## Accumulator
-Accumulate all the things.
+The Accumulator contains all of Contraptions collections. The collections are split into two groups, sequences and maps.
+
+These collections do not use arrays to store their items, instead they make use of the data structures provided by the `ext-ds` extension.
+
+### Sequences
+Sequence describes the behaviour of values arranged in a single, linear dimension. Some languages refer to this as a List. It’s similar to an array that uses incremental integer keys, with the exception of a few characteristics:
+
+- Values will always be indexed as `[0, 1, 2, …, size - 1]`.
+- Removing or inserting updates the position of all successive values.
+- Only allowed to access values by index in the range `[0, size - 1]`.
+
+ Collection | Description | Data Structure
+ ---|---|---|
+ `Contraption\Accumulator\Collection` | A super simple basic collection. | `Vector`
+
+### Maps
+A Map is a sequential collection of key-value pairs, almost identical to an array when used in a similar context. Keys can be any type, but must be unique. Values are replaced if added to the map using the same key.
+
+Like an array, insertion order is preserved.
+
+ Collection | Description | Data Structure
+ ---|---|---|
+ `Contraption\Accumulator\KeyedCollection` | A simple collection with keys. | `Map`
+ `Contraption\Accumulator\FixedCollection` | A collection that only contains unique values. | `Set`
+
+### Strict Mode
+All collections can optionally have strict mode enabled. Strict mode on a collection will enforce a particular data type.
+
+#### Sequences
+For sequences you need only provide the value type.
+
+    Contaners::basic()->strict('string')
+
+#### Maps
+For maps you need to provide both the key and value type.
+
+    Containers::keyed()->strict('string', MyEntity::class)
+
+### Normalise
+All collections can optionally have a normaliser ran against new entries. The normaliser must be of type `callable`.
+
+#### Sequences
+For sequences you set the value normalisation.
+
+    Containers::basic()->normaliseValues('strtolower')
+
+#### Maps
+For maps you can set a normaliser for keys and values.
+
+    Containers::keyed()->normaliseKeys('strtoupper')->normaliseValues('ceil')
 
 ## Conduit
 Smash those ducts.
