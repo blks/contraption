@@ -16,4 +16,18 @@ class Collections
     {
         return new KeyedCollection();
     }
+
+    /**
+     * Return a fresh instance of the simple collection.
+     *
+     * The simple collection uses the Ds\Vector class internally and allows for
+     * simple numerical key array like behaviour. Indexes shift with each removal,
+     * and should not be relied on.
+     *
+     * @return \Contraption\Accumulator\Collection
+     */
+    public static function simple(): Collection
+    {
+        return new Collection;
+    }
 }

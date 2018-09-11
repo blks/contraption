@@ -2,6 +2,7 @@
 
 namespace Contraption\Accumulator;
 
+use Ds\Collection as MapCollection;
 use Ds\Map;
 
 /**
@@ -9,18 +10,50 @@ use Ds\Map;
  *
  * A collection with custom keys, work as a map, or a standard PHP array.
  *
+ * @see     \Ds\Map
+ *
  * @mixin \Ds\Map
+ *
+ * @method KeyedCollection apply(callable $callback)
+ * @method KeyedCollection filter(?callable $callback = null)
+ * @method KeyedCollection map(callable $callback)
+ * @method KeyedCollection merge(array | \Traversable $values)
+ * @method KeyedCollection reverse()
+ * @method KeyedCollection reversed()
+ * @method KeyedCollection slice(int $offset, ?int $length = null)
+ * @method KeyedCollection sorted(?callable $comparator = null)
+ * @method KeyedCollection copy()
  *
  * @package Contraption\Accumulator
  */
 class KeyedCollection
 {
+    use Concerns\ReturnsNewSelf;
+
+    /**
+     * All underlying methods that should return a new instance of this
+     * container with the items set.
+     *
+     * @var array
+     */
+    private static $newInstance = [
+        'apply',
+        'filter',
+        'map',
+        'merge',
+        'reverse',
+        'reversed',
+        'slice',
+        'sorted',
+        'copy',
+    ];
+
     /**
      * The map containing the underlying items.
      *
      * @var \Ds\Map
      */
-    private $map;
+    private $items;
 
     /**
      * Whether or not strict mode is enabled.
@@ -45,7 +78,7 @@ class KeyedCollection
 
     public function __construct()
     {
-        $this->map = new Map;
+        $this->items = new Map;
     }
 
     /**
@@ -58,92 +91,17 @@ class KeyedCollection
      */
     public function __call($name, $arguments)
     {
-        if (method_exists($this->map, $name)) {
-            $this->map->{$name}(...$arguments);
+        if (method_exists($this->items, $name)) {
+            $this->items->{$name}(...$arguments);
             return $this;
         }
 
         throw new \RuntimeException(sprintf('Method %s not present', $name));
     }
 
-    private function setMap(Map $map): self
+    private function setItems(MapCollection $map): self
     {
-        $this->map = $map;
-        return $this;
-    }
-
-    public function copy(): self
-    {
-        $collection = new static;
-        /** @noinspection PhpParamsInspection */
-        $collection->setMap($this->map->copy());
-
-        return $collection;
-    }
-
-    /**
-     * @param \Contraption\Accumulator\KeyedCollection $collection
-     *
-     * @return \Contraption\Accumulator\KeyedCollection
-     */
-    public function diff(KeyedCollection $collection): self
-    {
-        $this->setMap($this->map->diff($collection->map));
-        return $this;
-    }
-
-    /**
-     * @param callable|null $callback
-     *
-     * @return \Contraption\Accumulator\KeyedCollection
-     */
-    public function filter(callable $callback = null): self
-    {
-        $this->setMap($this->map->filter($callback));
-        return $this;
-    }
-
-    /**
-     * @param \Contraption\Accumulator\KeyedCollection $collection
-     *
-     * @return \Contraption\Accumulator\KeyedCollection
-     */
-    public function intersect(KeyedCollection $collection): self
-    {
-        $this->setMap($this->map->intersect($collection->map));
-        return $this;
-    }
-
-    /**
-     * @param callable|null $comparator
-     *
-     * @return \Contraption\Accumulator\KeyedCollection
-     */
-    public function ksorted(callable $comparator = null): self
-    {
-        $this->setMap($this->map->ksorted($comparator));
-        return $this;
-    }
-
-    /**
-     * @param callable $callback
-     *
-     * @return \Contraption\Accumulator\KeyedCollection
-     */
-    public function map(callable $callback): self
-    {
-        $this->setMap($this->map->map($callback));
-        return $this;
-    }
-
-    /**
-     * @param $values
-     *
-     * @return \Contraption\Accumulator\KeyedCollection
-     */
-    public function merge($values): self
-    {
-        $this->setMap($this->map->merge($values));
+        $this->items = $map;
         return $this;
     }
 
@@ -164,7 +122,7 @@ class KeyedCollection
         $this->each(function ($value, $key) {
             try {
                 $this->validateInput($key, $value);
-            } catch(\TypeError $e) {
+            } catch (\TypeError $e) {
                 throw new \TypeError(sprintf('The current dataset is incompatiable with provided data types %s and %s', $this->keyType, $this->valueType));
             }
         });
@@ -202,7 +160,7 @@ class KeyedCollection
             }
 
             if (! $valueCheck) {
-                throw new \TypeError(sprintf('Value must be of type %s', $this->keyType));
+                throw new \TypeError(sprintf('Value must be of type %s', $this->valueType));
             }
         }
     }
@@ -218,7 +176,7 @@ class KeyedCollection
     public function put($key, $value): self
     {
         $this->validateInput($key, $value);
-        $this->map->put($key, $value);
+        $this->items->put($key, $value);
         return $this;
     }
 
@@ -231,10 +189,40 @@ class KeyedCollection
      */
     public function each(\Closure $callback): self
     {
-        foreach ($this->map as $key => $value) {
+        foreach ($this->items as $key => $value) {
             $callback($value, $key);
         }
 
         return $this;
+    }
+
+    /**
+     * @param \Contraption\Accumulator\KeyedCollection $collection
+     *
+     * @return \Contraption\Accumulator\KeyedCollection
+     */
+    public function diff(KeyedCollection $collection): self
+    {
+        return $this->newSelf($this->items->diff($collection->items));
+    }
+
+    /**
+     * @param \Contraption\Accumulator\KeyedCollection $collection
+     *
+     * @return \Contraption\Accumulator\KeyedCollection
+     */
+    public function intersect(KeyedCollection $collection): self
+    {
+        return $this->newSelf($this->items->intersect($collection->items));
+    }
+
+    public function union(KeyedCollection $collection): self
+    {
+        return $this->newSelf($this->items->union($collection->items));
+    }
+
+    public function xor(KeyedCollection $collection): self
+    {
+        return $this->newSelf($this->items->xor($collection->items));
     }
 }
